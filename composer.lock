@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e0104abf3c99f5f575c7e27963972c52",
+    "content-hash": "f9e09bfc87f9227b853ff3d56ebd5784",
     "packages": [
         {
             "name": "brick/math",
@@ -4133,16 +4133,16 @@
         },
         {
             "name": "saroven/laravel-reportify",
-            "version": "v1.0.2",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/saroven/laravel-reportify.git",
-                "reference": "be8b00ad6e9e3a274cf7d5c9138568c2d2a35cb5"
+                "reference": "3dbace346bae328a5e58b79fb80ba1a3e2529cb6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/saroven/laravel-reportify/zipball/be8b00ad6e9e3a274cf7d5c9138568c2d2a35cb5",
-                "reference": "be8b00ad6e9e3a274cf7d5c9138568c2d2a35cb5",
+                "url": "https://api.github.com/repos/saroven/laravel-reportify/zipball/3dbace346bae328a5e58b79fb80ba1a3e2529cb6",
+                "reference": "3dbace346bae328a5e58b79fb80ba1a3e2529cb6",
                 "shasum": ""
             },
             "require": {
@@ -4198,9 +4198,9 @@
             ],
             "support": {
                 "issues": "https://github.com/saroven/laravel-reportify/issues",
-                "source": "https://github.com/saroven/laravel-reportify/tree/v1.0.2"
+                "source": "https://github.com/saroven/laravel-reportify/tree/v1.0.4"
             },
-            "time": "2026-08-20T07:59:33+00:00"
+            "time": "2026-08-20T09:38:35+00:00"
         },
         {
             "name": "setasign/fpdi",
