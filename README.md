@@ -44,9 +44,9 @@ class UserController extends Controller implements Reportable
 
     public function index(Request $request)
     {
-        // 1-line export handler (PDF Stream, Excel, CSV, TXT)
+        // 1-line export handler (PDF Stream, PDF Chunk, Excel, CSV, TXT)
         if ($request->has('export')) {
-            $view = in_array($request->get('export'), ['pdfStream', 'pdf']) ? 'reports.users-pdf' : null;
+            $view = in_array($request->get('export'), ['pdfStream', 'pdf', 'pdfChunk']) ? 'reports.users-pdf' : null;
             return $this->exportReport($request, 'User Directory Report', view: $view, dataProvider: UserExport::class);
         }
 

@@ -21,6 +21,13 @@ it('streams pdf report via reportify', function () {
     $response->assertHeader('content-type', 'application/pdf');
 });
 
+it('processes chunked pdf report export via reportify', function () {
+    $response = $this->get('/users?export=pdfChunk');
+
+    $response->assertRedirect();
+    $response->assertSessionHas('success');
+});
+
 it('processes excel report export via reportify', function () {
     $response = $this->get('/users?export=excel');
 
