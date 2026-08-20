@@ -15,9 +15,14 @@
 <body class="bg-light">
 
     <div class="container py-4">
-        <!-- Title & Export Buttons -->
+        <!-- Title, Navigation & Export Buttons -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3">User List</h1>
+            <div class="d-flex align-items-center gap-3">
+                <h1 class="h3 mb-0">User List</h1>
+                <a href="{{ route('downloads.index') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-download me-1"></i>Download Manager
+                </a>
+            </div>
 
             <x-reportify-buttons
                 :pdfStream="['url' => '#', 'onClick' => 'exportLinkRedirectWithUrlParams(event, {type: `pdfStream`})']"
@@ -29,9 +34,14 @@
         </div>
 
         @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert alert-success alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
+                <div>
+                    <i class="fas fa-check-circle me-2"></i>{!! session('success') !!}
+                </div>
+                <a href="{{ route('downloads.index') }}" class="btn btn-sm btn-success text-white ms-3 text-nowrap">
+                    <i class="fas fa-download me-1"></i>Open Download Manager &rarr;
+                </a>
+                <button type="button" class="btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
 
