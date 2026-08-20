@@ -1,58 +1,212 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Reportify Quick Start & Demo Guide 🚀
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Welcome to **Laravel Reportify**! This repository serves as a complete working demo and quick-start reference for integrating [`saroven/laravel-reportify`](https://packagist.org/packages/saroven/laravel-reportify) into any Laravel application.
 
-## About Laravel
+Reportify simplifies multi-format document exporting (**PDF**, **Excel**, **CSV**, **TXT**, and **ZIP**) with minimal boilerplate, native queue integration, event-driven background processing, and built-in Blade components.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Step-by-Step Integration Guide for New Users
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. Installation
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Install the package via Composer:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer require saroven/laravel-reportify:^1.0.4
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Publish configuration and views (optional):
 
-## Contributing
+```bash
+php artisan vendor:publish --tag=reportify-config
+php artisan vendor:publish --tag=reportify-views
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+### 2. Make Any Controller Exportable
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Implement the `Reportable` interface and use the `HasReportify` trait on your controller:
 
-## Security Vulnerabilities
+```php
+namespace App\Http\Controllers;
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+use Illuminate\Http\Request;
+use Saroven\Reportify\Contracts\Reportable;
+use Saroven\Reportify\Traits\HasReportify;
+use App\Exports\UserExport;
+use App\Models\User;
 
-## License
+class UserController extends Controller implements Reportable
+{
+    use HasReportify;
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+    public function index(Request $request)
+    {
+        // 1-line export handler (PDF Stream, Excel, CSV, TXT)
+        if ($request->has('export')) {
+            $view = in_array($request->get('export'), ['pdfStream', 'pdf']) ? 'reports.users-pdf' : null;
+            return $this->exportReport($request, 'User Directory Report', view: $view, dataProvider: UserExport::class);
+        }
+
+        $users = User::latest('id')->paginate(10);
+        return view('users.index', compact('users'));
+    }
+
+    public function getExportData(array $payload, string $exportType, int|string|null $userId = null): mixed
+    {
+        return User::query()->get();
+    }
+}
+```
+
+---
+
+### 3. Generate Dedicated Export Classes
+
+Generate clean data provider classes using the Artisan generator command:
+
+```bash
+php artisan reportify:make UserExport
+```
+
+This creates `app/Exports/UserExport.php`:
+
+```php
+namespace App\Exports;
+
+use App\Models\User;
+use Saroven\Reportify\Contracts\Reportable;
+
+class UserExport implements Reportable
+{
+    public function getExportData(array $payload, string $exportType, int|string|null $userId = null): mixed
+    {
+        $query = User::query();
+
+        if (!empty($payload['search'])) {
+            $search = $payload['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        return $query->latest('id')->get()->map(function (User $user) {
+            return [
+                'ID' => $user->id,
+                'Name' => $user->name,
+                'Email' => $user->email,
+                'Role' => $user->role,
+                'Department' => $user->department ?? '-',
+                'Phone' => $user->phone ?? '-',
+                'Status' => $user->status,
+                'Created At' => $user->created_at ? $user->created_at->format('Y-m-d H:i:s') : '-',
+            ];
+        });
+    }
+}
+```
+
+---
+
+### 4. Drop-in Export Buttons & Scripts in Blade
+
+Include the drop-in export buttons component `<x-reportify-buttons />` and helper scripts `<x-reportify-scripts />` in your Blade views:
+
+```html
+<!-- Drop-in Export Action Buttons Component -->
+<x-reportify-buttons
+    :pdfStream="['url' => '#', 'onClick' => 'exportLinkRedirectWithUrlParams(event, {type: `pdfStream`})']"
+    :pdf="['url' => '#', 'onClick' => 'exportLinkRedirectWithUrlParams(event, {type: `pdf`})']"
+    :excel="['url' => '#', 'onClick' => 'exportLinkRedirectWithUrlParams(event, {type: `excel`})']"
+    :csv="['url' => '#', 'onClick' => 'exportLinkRedirectWithUrlParams(event, {type: `csv`})']"
+    :txt="['url' => '#', 'onClick' => 'exportLinkRedirectWithUrlParams(event, {type: `txt`})']"
+/>
+
+<!-- Include helper scripts at the end of the view body -->
+<x-reportify-scripts />
+```
+
+---
+
+### 5. Build a Download Manager with Event Listeners
+
+Reportify dispatches lifecycle events during background exports (`ExportStarted`, `ExportCompleted`, `ExportFailed`). Register listeners in `AppServiceProvider.php` to track file processing states and persist downloads:
+
+```php
+namespace App\Providers;
+
+use App\Models\Download;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Event;
+use Saroven\Reportify\Events\ExportStarted;
+use Saroven\Reportify\Events\ExportCompleted;
+use Saroven\Reportify\Events\ExportFailed;
+
+class AppServiceProvider extends ServiceProvider
+{
+    public function boot(): void
+    {
+        // 1. Export Started (Set processing status)
+        Event::listen(function (ExportStarted $event) {
+            Download::create([
+                'user_id' => $event->userId ?: null,
+                'title' => $event->title,
+                'format' => strtoupper($event->exportFormat),
+                'status' => 'processing',
+            ]);
+        });
+
+        // 2. Export Completed (Update to completed status)
+        Event::listen(function (ExportCompleted $event) {
+            $download = Download::where('title', $event->title)
+                ->where('format', strtoupper($event->exportFormat))
+                ->where('status', 'processing')
+                ->latest('id')
+                ->first();
+
+            if ($download) {
+                $download->update([
+                    'file_path' => $event->filePath,
+                    'status' => 'completed',
+                ]);
+            }
+        });
+
+        // 3. Export Failed (Update to failed status)
+        Event::listen(function (ExportFailed $event) {
+            $download = Download::where('title', $event->title)
+                ->where('format', strtoupper($event->exportFormat))
+                ->where('status', 'processing')
+                ->latest('id')
+                ->first();
+
+            if ($download) {
+                $download->update([
+                    'status' => 'failed',
+                    'error' => $event->errorMessage,
+                ]);
+            }
+        });
+    }
+}
+```
+
+---
+
+## 🧪 Running Tests
+
+Run the Pest test suite:
+
+```bash
+vendor/bin/pest
+```
+
+---
+
+## 📜 License
+
+The MIT License (MIT).
