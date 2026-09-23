@@ -47,7 +47,22 @@ class UserController extends Controller implements Reportable
         // 1-line export handler (PDF Stream, PDF Chunk, Excel, CSV, TXT)
         if ($request->has('export')) {
             $view = in_array($request->get('export'), ['pdfStream', 'pdf', 'pdfChunk']) ? 'reports.users-pdf' : null;
-            return $this->exportReport($request, 'User Directory Report', view: $view, dataProvider: UserExport::class);
+
+            $additionalData = [];
+            if ($request->filled('header_margin')) {
+                $additionalData['headerMargin'] = (int) $request->input('header_margin');
+            }
+            if ($request->filled('additional_header_margin')) {
+                $additionalData['additionalHeaderMargin'] = (int) $request->input('additional_header_margin');
+            }
+
+            return $this->exportReport(
+                $request,
+                'User Directory Report',
+                view: $view,
+                additionalData: $additionalData,
+                dataProvider: UserExport::class
+            );
         }
 
         $users = User::latest('id')->paginate(10);
@@ -194,6 +209,22 @@ class AppServiceProvider extends ServiceProvider
     }
 }
 ```
+
+
+---
+
+### 6. API Support & Header Margin Fine-Tuning
+
+- **Automatic JSON Responses**: When called with `Accept: application/json`, `exportReport()` automatically returns a JSON response instead of a web redirect:
+  ```json
+  {
+      "message": "Export for 'User Directory Report' is being processed. Check Download Manager."
+  }
+  ```
+- **Header Margin Control**: Fine-tune PDF margins per-report via ``:
+  - `headerMargin` (int): Hard override for the PDF top margin in mm (bypasses auto-calculation).
+  - `additionalHeaderMargin` (int): Additive offset applied on top of the auto-calculated or overridden margin (supports negative values to reduce margin).
+  - Global default can be configured in `config/reportify.php` under `'mpdf.default_header_margin' => 28`.
 
 ---
 

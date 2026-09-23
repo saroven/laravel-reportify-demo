@@ -57,6 +57,7 @@ return [
         'default_paper_size' => 'A4',
         'default_orientation' => 'P',
         'author' => env('APP_NAME', 'Laravel'),
+        'default_header_margin' => 28,
     ],
 
     /*

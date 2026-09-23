@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f9e09bfc87f9227b853ff3d56ebd5784",
+    "content-hash": "2eb5792b28e8215af2b241e9842877c6",
     "packages": [
         {
             "name": "brick/math",
@@ -4133,16 +4133,16 @@
         },
         {
             "name": "saroven/laravel-reportify",
-            "version": "v1.0.4",
+            "version": "v1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/saroven/laravel-reportify.git",
-                "reference": "3dbace346bae328a5e58b79fb80ba1a3e2529cb6"
+                "reference": "cd787d04642505910a4d986d1d9d867d5daa1190"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/saroven/laravel-reportify/zipball/3dbace346bae328a5e58b79fb80ba1a3e2529cb6",
-                "reference": "3dbace346bae328a5e58b79fb80ba1a3e2529cb6",
+                "url": "https://api.github.com/repos/saroven/laravel-reportify/zipball/cd787d04642505910a4d986d1d9d867d5daa1190",
+                "reference": "cd787d04642505910a4d986d1d9d867d5daa1190",
                 "shasum": ""
             },
             "require": {
@@ -4152,7 +4152,7 @@
                 "php": "^8.1"
             },
             "require-dev": {
-                "orchestra/testbench": "^7.0|^8.0|^9.0",
+                "orchestra/testbench": "^7.0|^8.0|^9.0|^10.0",
                 "pestphp/pest": "^1.22|^2.0|^3.0",
                 "pestphp/pest-plugin-laravel": "^1.3|^2.0|^3.0",
                 "phpunit/phpunit": "^9.5|^10.0"
@@ -4198,9 +4198,9 @@
             ],
             "support": {
                 "issues": "https://github.com/saroven/laravel-reportify/issues",
-                "source": "https://github.com/saroven/laravel-reportify/tree/v1.0.4"
+                "source": "https://github.com/saroven/laravel-reportify/tree/v1.0.5"
             },
-            "time": "2026-08-20T09:38:35+00:00"
+            "time": "2026-09-23T05:18:22+00:00"
         },
         {
             "name": "setasign/fpdi",

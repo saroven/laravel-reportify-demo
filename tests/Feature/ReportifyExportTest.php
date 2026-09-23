@@ -48,3 +48,26 @@ it('processes txt report export via reportify', function () {
     $response->assertRedirect();
     $response->assertSessionHas('success');
 });
+
+it('returns json response for api export requests', function () {
+    $response = $this->getJson('/users?export=excel');
+
+    $response->assertStatus(200);
+    $response->assertJson([
+        'message' => "Export for 'User Directory Report' is being processed. Check Download Manager.",
+    ]);
+});
+
+it('processes pdf export with custom header margin options', function () {
+    $response = $this->get('/users?export=pdf&header_margin=35&additional_header_margin=5');
+
+    $response->assertRedirect();
+    $response->assertSessionHas('success');
+});
+
+it('streams pdf report with additional header margin', function () {
+    $response = $this->get('/users?export=pdfStream&additional_header_margin=10');
+
+    $response->assertStatus(200);
+    $response->assertHeader('content-type', 'application/pdf');
+});

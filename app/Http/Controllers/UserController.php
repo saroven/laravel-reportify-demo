@@ -15,7 +15,22 @@ class UserController extends Controller implements Reportable
     {
         if ($request->has('export')) {
             $view = in_array($request->get('export'), ['pdfStream', 'pdf', 'pdfChunk']) ? 'reports.users-pdf' : null;
-            return $this->exportReport($request, 'User Directory Report', view: $view, dataProvider: \App\Exports\UserExport::class);
+
+            $additionalData = [];
+            if ($request->filled('header_margin')) {
+                $additionalData['headerMargin'] = (int) $request->input('header_margin');
+            }
+            if ($request->filled('additional_header_margin')) {
+                $additionalData['additionalHeaderMargin'] = (int) $request->input('additional_header_margin');
+            }
+
+            return $this->exportReport(
+                $request,
+                'User Directory Report',
+                view: $view,
+                additionalData: $additionalData,
+                dataProvider: \App\Exports\UserExport::class
+            );
         }
 
         $query = User::query();

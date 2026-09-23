@@ -12,7 +12,7 @@
         "php": "^8.3",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
-        "saroven/laravel-reportify": "^1.0.4"
+        "saroven/laravel-reportify": "^1.0.5"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -87,5 +87,7 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "repositories": {
+    }
 }
