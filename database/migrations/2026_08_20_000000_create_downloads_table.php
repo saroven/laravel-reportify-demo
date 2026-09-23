@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('downloads', function (Blueprint $table) {
             $table->id();
+            $table->string('export_id')->nullable()->index();
             $table->foreignId('user_id')->nullable()->index();
             $table->string('title');
             $table->string('format');

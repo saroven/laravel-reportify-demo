@@ -30,57 +30,64 @@ class AppServiceProvider extends ServiceProvider
             Log::info("Export '{$event->title}' has started processing.");
 
             Download::create([
-                'user_id' => $event->userId ?: null,
-                'title' => $event->title,
-                'format' => strtoupper($event->exportFormat),
-                'status' => 'processing',
+                'export_id' => $event->exportId,
+                'user_id'   => $event->userId ?: null,
+                'title'     => $event->title,
+                'format'    => strtoupper($event->exportFormat),
+                'status'    => 'processing',
             ]);
         });
 
         // 2. Update record to completed when ExportCompleted fires
         Event::listen(function (ExportCompleted $event) {
-            $download = Download::where('title', $event->title)
-                ->where('format', strtoupper($event->exportFormat))
-                ->where('status', 'processing')
-                ->latest('id')
-                ->first();
+            $download = $event->exportId
+                ? Download::where('export_id', $event->exportId)->first()
+                : Download::where('title', $event->title)
+                    ->where('format', strtoupper($event->exportFormat))
+                    ->where('status', 'processing')
+                    ->latest('id')
+                    ->first();
 
             if ($download) {
                 $download->update([
                     'file_path' => $event->filePath,
-                    'status' => 'completed',
+                    'status'    => 'completed',
                 ]);
             } else {
                 Download::create([
-                    'user_id' => $event->userId ?: null,
-                    'title' => $event->title,
-                    'format' => strtoupper($event->exportFormat),
+                    'export_id' => $event->exportId,
+                    'user_id'   => $event->userId ?: null,
+                    'title'     => $event->title,
+                    'format'    => strtoupper($event->exportFormat),
                     'file_path' => $event->filePath,
-                    'status' => 'completed',
+                    'status'    => 'completed',
                 ]);
             }
         });
 
         // 3. Update record to failed when ExportFailed fires
         Event::listen(function (ExportFailed $event) {
-            $download = Download::where('title', $event->title)
-                ->where('format', strtoupper($event->exportFormat))
-                ->where('status', 'processing')
-                ->latest('id')
-                ->first();
+            $download = $event->exportId
+                ? Download::where('export_id', $event->exportId)->first()
+                : Download::where('title', $event->title)
+                    ->where('format', strtoupper($event->exportFormat))
+                    ->where('status', 'processing')
+                    ->latest('id')
+                    ->first();
 
             if ($download) {
                 $download->update([
                     'status' => 'failed',
-                    'error' => $event->errorMessage,
+                    'error'  => $event->errorMessage,
                 ]);
             } else {
                 Download::create([
-                    'user_id' => $event->userId ?: null,
-                    'title' => $event->title,
-                    'format' => strtoupper($event->exportFormat),
-                    'status' => 'failed',
-                    'error' => $event->errorMessage,
+                    'export_id' => $event->exportId,
+                    'user_id'   => $event->userId ?: null,
+                    'title'     => $event->title,
+                    'format'    => strtoupper($event->exportFormat),
+                    'status'    => 'failed',
+                    'error'     => $event->errorMessage,
                 ]);
             }
         });

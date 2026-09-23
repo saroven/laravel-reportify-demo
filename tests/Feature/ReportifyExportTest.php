@@ -56,6 +56,7 @@ it('returns json response for api export requests', function () {
     $response->assertJson([
         'message' => "Export for 'User Directory Report' is being processed. Check Download Manager.",
     ]);
+    expect($response->json('export_id'))->not->toBeEmpty();
 });
 
 it('processes pdf export with custom header margin options', function () {

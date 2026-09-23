@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['user_id', 'title', 'format', 'file_path', 'status', 'error'])]
+#[Fillable(['export_id', 'user_id', 'title', 'format', 'file_path', 'status', 'error'])]
 class Download extends Model
 {
     use HasFactory;

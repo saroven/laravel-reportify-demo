@@ -101,3 +101,32 @@ it('deletes download record and file', function () {
     $this->assertDatabaseMissing('downloads', ['id' => $download->id]);
     Storage::disk('public')->assertMissing('exports/excel/sample.xlsx');
 });
+
+it('correctly tracks concurrent exports with the same title using exportId without collision', function () {
+    $exportId1 = 'export-uuid-aaa-111';
+    $exportId2 = 'export-uuid-bbb-222';
+
+    // Job 1 starts, then Job 2 starts
+    ExportStarted::dispatch(1, 'Sales Report', 'excel', [], $exportId1);
+    ExportStarted::dispatch(1, 'Sales Report', 'excel', [], $exportId2);
+
+    // Job 1 completes first
+    ExportCompleted::dispatch(1, 'Sales Report', 'excel', 'exports/sales-1.xlsx', [], $exportId1);
+
+    // Verify Job 1 record is completed with sales-1.xlsx
+    $download1 = Download::where('export_id', $exportId1)->first();
+    expect($download1->status)->toBe('completed')
+        ->and($download1->file_path)->toBe('exports/sales-1.xlsx');
+
+    // Verify Job 2 record is STILL processing (no race condition collision!)
+    $download2 = Download::where('export_id', $exportId2)->first();
+    expect($download2->status)->toBe('processing')
+        ->and($download2->file_path)->toBeNull();
+
+    // Now Job 2 completes
+    ExportCompleted::dispatch(1, 'Sales Report', 'excel', 'exports/sales-2.xlsx', [], $exportId2);
+
+    $download2->refresh();
+    expect($download2->status)->toBe('completed')
+        ->and($download2->file_path)->toBe('exports/sales-2.xlsx');
+});
