@@ -13,7 +13,7 @@ Reportify simplifies multi-format document exporting (**PDF**, **Excel**, **CSV*
 Install the package via Composer:
 
 ```bash
-composer require saroven/laravel-reportify:^1.0.4
+composer require saroven/laravel-reportify:^1.0.5
 ```
 
 Publish configuration and views (optional):
@@ -221,7 +221,7 @@ class AppServiceProvider extends ServiceProvider
       "message": "Export for 'User Directory Report' is being processed. Check Download Manager."
   }
   ```
-- **Header Margin Control**: Fine-tune PDF margins per-report via ``:
+- **Header Margin Control**: Fine-tune PDF margins per-report via `$additionalData`:
   - `headerMargin` (int): Hard override for the PDF top margin in mm (bypasses auto-calculation).
   - `additionalHeaderMargin` (int): Additive offset applied on top of the auto-calculated or overridden margin (supports negative values to reduce margin).
   - Global default can be configured in `config/reportify.php` under `'mpdf.default_header_margin' => 28`.
